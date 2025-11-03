@@ -1,7 +1,6 @@
 
 import { Injectable } from '@angular/core';
-import { GoogleGenAI, GenerateVideosOperationResponse } from '@google/genai';
-
+import { GoogleGenAI, GenerateVideosOperation } from '@google/genai';
 // IMPORTANT: This service assumes that `process.env.API_KEY` is set in the environment.
 const API_KEY = process.env.API_KEY;
 
