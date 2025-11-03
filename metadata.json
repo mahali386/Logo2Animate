@@ -1,0 +1,5 @@
+{
+  "name": "AI Logo Animator",
+  "description": "Design a company logo from a description using AI image generation, or upload your own. Then, bring your logo to life with a stunning AI-generated video animation.",
+  "requestFramePermissions": []
+}

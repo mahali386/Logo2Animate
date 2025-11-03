@@ -1,0 +1,198 @@
+<main class="min-h-screen bg-gray-900 text-white font-sans p-4 sm:p-6 lg:p-8">
+  <div class="max-w-4xl mx-auto">
+    
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
+        AI Logo Animator
+      </h1>
+      <p class="mt-3 text-lg text-gray-400 max-w-2xl mx-auto">
+        Create a stunning logo and bring it to life with AI-powered animation in two simple steps.
+      </p>
+    </header>
+
+    <!-- Error Display -->
+    @if (appState() === 'error' && error()) {
+      <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded-lg relative mb-6" role="alert">
+        <strong class="font-bold">An Error Occurred:</strong>
+        <span class="block sm:inline ml-2">{{ error() }}</span>
+        <button (click)="appState.set('idle')" class="absolute top-0 bottom-0 right-0 px-4 py-3 text-red-200 hover:text-white">
+          <svg class="fill-current h-6 w-6" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+        </button>
+      </div>
+    }
+
+    <!-- Step 1: Create Logo -->
+    <div class="bg-gray-800/50 rounded-xl shadow-2xl p-6 mb-8 border border-gray-700">
+      <h2 class="text-2xl font-bold mb-4 flex items-center">
+        <span class="bg-blue-500 text-white rounded-full h-8 w-8 flex items-center justify-center mr-3">1</span>
+        Create Your Logo
+      </h2>
+
+      <!-- Tabs -->
+      <div class="flex border-b border-gray-700 mb-4">
+        <button (click)="selectTab('generate')" 
+                [class.border-blue-500]="activeTab() === 'generate'"
+                [class.text-blue-400]="activeTab() === 'generate'"
+                [class.border-transparent]="activeTab() !== 'generate'"
+                [class.text-gray-400]="activeTab() !== 'generate'"
+                class="py-2 px-4 font-semibold border-b-2 hover:text-blue-400 transition-colors focus:outline-none">
+          Generate with AI
+        </button>
+        <button (click)="selectTab('upload')" 
+                [class.border-blue-500]="activeTab() === 'upload'"
+                [class.text-blue-400]="activeTab() === 'upload'"
+                [class.border-transparent]="activeTab() !== 'upload'"
+                [class.text-gray-400]="activeTab() !== 'upload'"
+                class="py-2 px-4 font-semibold border-b-2 hover:text-blue-400 transition-colors focus:outline-none">
+          Upload Your Own
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      @if (activeTab() === 'generate') {
+        <div class="space-y-4">
+          <textarea [value]="logoPrompt()" (input)="logoPrompt.set($event.target.value)" 
+                    rows="3"
+                    placeholder="e.g., a minimalist wolf icon for a tech company"
+                    class="w-full bg-gray-900 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"></textarea>
+          <button (click)="submitLogoPrompt()" [disabled]="appState() === 'generatingLogo'"
+                  class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center">
+            @if(appState() === 'generatingLogo') {
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Generating...
+            } @else {
+              Generate Logo
+            }
+          </button>
+        </div>
+      }
+      
+      @if (activeTab() === 'upload') {
+        <div>
+          <label for="logo-upload" class="cursor-pointer flex justify-center w-full h-32 px-4 transition bg-gray-900 border-2 border-gray-600 border-dashed rounded-md appearance-none hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <span class="flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              <span class="font-medium text-gray-500">
+                Drop files to Attach, or <span class="text-blue-500 underline">browse</span>
+              </span>
+            </span>
+            <input type="file" id="logo-upload" name="logo-upload" accept="image/png, image/jpeg" class="hidden" (change)="handleImageUpload($event)">
+          </label>
+        </div>
+      }
+    </div>
+
+    <!-- Logo Display -->
+    @if (imageSourceForAnimation()) {
+      <div class="bg-gray-800/50 rounded-xl shadow-2xl p-6 mb-8 border border-gray-700">
+        <h2 class="text-xl font-bold mb-4">Your Logo</h2>
+        <div class="flex justify-center items-center bg-gray-900 rounded-lg p-4 h-64">
+            <img [src]="imageSourceForAnimation()" alt="User Logo" class="max-h-full max-w-full object-contain">
+        </div>
+      </div>
+
+      <!-- Step 2: Animate Logo -->
+      <div class="bg-gray-800/50 rounded-xl shadow-2xl p-6 mb-8 border border-gray-700">
+        <h2 class="text-2xl font-bold mb-4 flex items-center">
+          <span class="bg-purple-500 text-white rounded-full h-8 w-8 flex items-center justify-center mr-3">2</span>
+          Animate Your Logo
+        </h2>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="font-semibold text-gray-300">Video Aspect Ratio</label>
+                <div class="flex items-center space-x-4 mt-2">
+                    <button (click)="aspectRatio.set('16:9')" [class.ring-2]="aspectRatio() === '16:9'" class="bg-gray-700 hover:bg-gray-600 rounded-lg p-3 w-24 text-center ring-offset-2 ring-offset-gray-800 ring-blue-500 transition">
+                        16:9 Landscape
+                    </button>
+                    <button (click)="aspectRatio.set('9:16')" [class.ring-2]="aspectRatio() === '9:16'" class="bg-gray-700 hover:bg-gray-600 rounded-lg p-3 w-24 text-center ring-offset-2 ring-offset-gray-800 ring-blue-500 transition">
+                        9:16 Portrait
+                    </button>
+                </div>
+            </div>
+          
+            <button (click)="submitAnimationRequest()" [disabled]="appState() === 'generatingVideo'"
+                    class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center">
+              @if(appState() === 'generatingVideo') {
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Animating...
+              } @else {
+                Generate Animation
+              }
+            </button>
+        </div>
+      </div>
+    }
+
+    <!-- Video Display / Loading -->
+    @if(appState() === 'generatingVideo') {
+      <div class="bg-gray-800/50 rounded-xl shadow-2xl p-6 border border-gray-700">
+        <div class="flex flex-col items-center justify-center h-64 text-center">
+            <svg class="animate-spin h-12 w-12 text-purple-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-lg font-semibold text-gray-300">{{ videoLoadingMessage() }}</p>
+            <p class="text-sm text-gray-500 mt-1">This can take a few minutes. Please don't close this window.</p>
+        </div>
+      </div>
+    }
+
+    @if (appState() === 'finished' && generatedVideoUrl()) {
+      <div class="bg-gray-800/50 rounded-xl shadow-2xl p-6 border border-gray-700">
+        <h2 class="text-2xl font-bold mb-4">Your Animated Logo</h2>
+        <video [src]="generatedVideoUrl()" controls autoplay loop class="w-full rounded-lg shadow-lg"></video>
+        
+        <div class="mt-6 flex flex-col sm:flex-row gap-4">
+          <!-- Action Buttons -->
+          <div class="relative">
+            <button (click)="showDownloadOptions.set(!showDownloadOptions())" class="w-full sm:w-auto flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+              Download
+            </button>
+            @if(showDownloadOptions()) {
+              <div class="absolute bottom-full mb-2 w-full sm:w-auto bg-gray-700 rounded-md shadow-lg z-10">
+                <a (click)="downloadVideo('mp4')" class="block px-4 py-2 text-sm text-white hover:bg-gray-600 cursor-pointer">as MP4</a>
+                <a (click)="downloadVideo('gif')" class="block px-4 py-2 text-sm text-white hover:bg-gray-600 cursor-pointer">as GIF</a>
+              </div>
+            }
+          </div>
+
+          <div class="relative">
+            <button (click)="showShareOptions.set(!showShareOptions())" class="w-full sm:w-auto flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" /></svg>
+              Share
+            </button>
+            @if(showShareOptions()) {
+              <div class="absolute bottom-full mb-2 w-full sm:w-auto bg-gray-700 rounded-md shadow-lg z-10 flex p-2 gap-2">
+                <button (click)="shareOnSocial('twitter')" class="text-white hover:text-blue-400 p-2 rounded-full hover:bg-gray-600 transition" title="Share on Twitter">
+                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.223.085c.645 1.956 2.52 3.375 4.738 3.414A9.87 9.87 0 010 17.53a13.94 13.94 0 007.548 2.212c9.058 0 14.01-7.502 14.01-14.013 0-.213-.005-.426-.015-.637.96-.689 1.792-1.556 2.459-2.544l-.002-.001z"/></svg>
+                </button>
+                <button (click)="shareOnSocial('facebook')" class="text-white hover:text-blue-600 p-2 rounded-full hover:bg-gray-600 transition" title="Share on Facebook">
+                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v2.385z"/></svg>
+                </button>
+                 <button (click)="shareOnSocial('linkedin')" class="text-white hover:text-blue-500 p-2 rounded-full hover:bg-gray-600 transition" title="Share on LinkedIn">
+                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-4.481 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.59-11.018-3.714v-2.155z"/></svg>
+                </button>
+              </div>
+            }
+          </div>
+          
+          <button (click)="reset()" class="w-full sm:w-auto flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition">
+            Start Over
+          </button>
+        </div>
+      </div>
+    }
+    
+  </div>
+</main>
